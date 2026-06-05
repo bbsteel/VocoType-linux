@@ -316,6 +316,16 @@ class RimeHandler:
             # 获取上下文
             context = self.session.get_context()
             if context:
+                # 预编辑（C++ 端 updateUI 已支持 setPreedit，需喂数据）
+                composition = getattr(context, "composition", None)
+                if composition:
+                    preedit_text = getattr(composition, "preedit", None)
+                    if preedit_text:
+                        result["preedit"] = {
+                            "text": preedit_text,
+                            "cursor_pos": getattr(composition, "cursor_pos", 0),
+                        }
+
                 # 候选词
                 menu = getattr(context, "menu", None)
                 candidates = getattr(menu, "candidates", None) or []
@@ -323,7 +333,7 @@ class RimeHandler:
                     result["candidates"] = [
                         {
                             "text": getattr(c, "text", ""),
-                            "comment": getattr(c, "comment", "") or ""
+                            "comment": ""
                         }
                         for c in candidates
                     ]
