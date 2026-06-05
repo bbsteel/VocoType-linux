@@ -16,7 +16,7 @@
 #include <fcitx/inputmethodengine.h>
 #include <fcitx/inputmethodentry.h>
 #include <fcitx/inputcontextproperty.h>
-#include <fcitx-utils/eventloopinterface.h>
+#include <fcitx-utils/event.h>
 #include <fcitx-utils/key.h>
 #include <memory>
 #include <string>

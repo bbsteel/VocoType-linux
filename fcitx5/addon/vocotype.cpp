@@ -203,13 +203,13 @@ VoCoTypeAddon::~VoCoTypeAddon() {
 }
 
 void VoCoTypeAddon::reloadConfig() {
-    fcitx::readAsIni(config_, fcitx::StandardPathsType::PkgConfig,
+    fcitx::readAsIni(config_, fcitx::StandardPath::Type::PkgConfig,
                      FCITX_CONFIG_PATH);
     applyHotkeyConfig();
 }
 
 void VoCoTypeAddon::save() {
-    if (!fcitx::safeSaveAsIni(config_, fcitx::StandardPathsType::PkgConfig,
+    if (!fcitx::safeSaveAsIni(config_, fcitx::StandardPath::Type::PkgConfig,
                               FCITX_CONFIG_PATH)) {
         FCITX_WARN() << "保存 Fcitx5 输入法配置失败: " << FCITX_CONFIG_PATH;
     }

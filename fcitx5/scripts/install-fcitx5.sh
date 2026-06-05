@@ -540,6 +540,12 @@ if [ ! -x "$PYTHON" ]; then
     exit 1
 fi
 
+# Fcitx5 后端不依赖 IBus 的 gi/PyGObject 栈；直接复用仓库根 requirements.txt
+# 会在 Python 3.12 上额外触发 pycairo/PyGObject 构建，导致非必需的系统依赖失败。
+FCITX5_REQUIREMENTS="$(mktemp)"
+grep -v '^PyGObject' "$PROJECT_DIR/requirements.txt" > "$FCITX5_REQUIREMENTS"
+trap 'rm -f "$FCITX5_REQUIREMENTS"' EXIT
+
 # 安装依赖
 if [ "$USE_SYSTEM_PYTHON" = "1" ]; then
     if ! "$PYTHON" - << 'PY' >/dev/null 2>&1
@@ -553,18 +559,19 @@ import funasr_onnx  # noqa: F401
 PY
     then
         echo "系统 Python 缺少依赖。请先执行："
-        echo "  $PYTHON -m pip install -r $PROJECT_DIR/requirements.txt pyrime"
+        echo "  grep -v '^PyGObject' $PROJECT_DIR/requirements.txt | $PYTHON -m pip install -r /dev/stdin"
+        echo "  $PYTHON -m pip install pyrime"
         exit 1
     fi
 else
     if command -v uv &>/dev/null; then
         echo "使用 uv 安装依赖..."
-        uv pip install -r "$PROJECT_DIR/requirements.txt" --python "$PYTHON"
+        uv pip install -r "$FCITX5_REQUIREMENTS" --python "$PYTHON"
         uv pip install pyrime --python "$PYTHON"
     else
         echo "使用 pip 安装依赖..."
         "$PYTHON" -m pip install --upgrade pip
-        "$PYTHON" -m pip install -r "$PROJECT_DIR/requirements.txt"
+        "$PYTHON" -m pip install -r "$FCITX5_REQUIREMENTS"
         "$PYTHON" -m pip install pyrime
     fi
 fi
