@@ -73,6 +73,30 @@ fcitx5 -r
 
 详细安装说明：[fcitx5/README.md](fcitx5/README.md)
 
+#### Steam Deck / SteamOS
+
+SteamOS 默认根目录只读、且 fcitx5-utils 旧版头文件路径与上游不兼容。
+提供 `install-steamdeck-fcitx5.sh` 包装脚本，自动处理：
+- 关闭 `steamos-readonly`
+- `pacman` 装 fcitx5 全家桶、rime、python、python-uv 等
+- 应用已知 fcitx5 兼容补丁（`eventloopinterface.h → event.h` 等）
+- 跑 `install-fcitx5.sh` 走默认选项（SLM 关闭、用户级 venv）
+- 写入 `~/.config/vocotype/rime/user.yaml` 指定默认 schema
+
+```bash
+git clone https://github.com/bbsteel/VocoType-linux.git
+cd VocoType-linux
+bash fcitx5/scripts/install-steamdeck-fcitx5.sh
+
+# 跳过交互式音频配置
+bash fcitx5/scripts/install-steamdeck-fcitx5.sh --skip-audio
+
+# 改默认 Rime 方案（小鹤双拼）
+VOCOTYPE_RIME_SCHEMA=double_pinyin_flypy bash fcitx5/scripts/install-steamdeck-fcitx5.sh
+```
+
+非 Steam Deck 的 Arch / Manjaro 用户也可以用此脚本（脚本会跳过 `steamos-readonly` 步骤）。
+
 ---
 
 ## SLM 后处理配置（通用）
